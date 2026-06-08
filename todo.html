@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>To-do 리스트</title>
+<style>
+  body {
+    font-family: -apple-system, "Malgun Gothic", sans-serif;
+    background: #f4f5f7;
+    display: flex;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 24px;
+    width: 100%;
+    max-width: 420px;
+  }
+  h1 {
+    font-size: 20px;
+    margin: 0 0 16px;
+  }
+  .input-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .input-row input {
+    flex: 1;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 14px;
+  }
+  .input-row button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #4f46e5;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  .input-row button:hover { background: #4338ca; }
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 4px;
+    border-bottom: 1px solid #eee;
+  }
+  li span {
+    flex: 1;
+    font-size: 14px;
+  }
+  li.done span {
+    text-decoration: line-through;
+    color: #aaa;
+  }
+  li button {
+    border: none;
+    background: none;
+    color: #999;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  li button:hover { color: #e11d48; }
+  .empty {
+    text-align: center;
+    color: #999;
+    font-size: 13px;
+    padding: 20px 0;
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>📝 나의 To-do 리스트</h1>
+    <div class="input-row">
+      <input type="text" id="todo-input" placeholder="할 일을 입력하세요" />
+      <button id="add-btn">추가</button>
+    </div>
+    <ul id="todo-list"></ul>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "todos";
+    const input = document.getElementById("todo-input");
+    const addBtn = document.getElementById("add-btn");
+    const list = document.getElementById("todo-list");
+
+    function loadTodos() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    }
+
+    function saveTodos(todos) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+    }
+
+    function render() {
+      const todos = loadTodos();
+      list.innerHTML = "";
+
+      if (todos.length === 0) {
+        list.innerHTML = '<li class="empty">할 일이 없습니다. 추가해보세요!</li>';
+        return;
+      }
+
+      todos.forEach((todo, index) => {
+        const li = document.createElement("li");
+        li.className = todo.done ? "done" : "";
+
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = todo.done;
+        checkbox.addEventListener("change", () => toggleDone(index));
+
+        const span = document.createElement("span");
+        span.textContent = todo.text;
+
+        const removeBtn = document.createElement("button");
+        removeBtn.textContent = "삭제";
+        removeBtn.addEventListener("click", () => removeTodo(index));
+
+        li.appendChild(checkbox);
+        li.appendChild(span);
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+      });
+    }
+
+    function addTodo() {
+      const text = input.value.trim();
+      if (!text) return;
+      const todos = loadTodos();
+      todos.push({ text, done: false });
+      saveTodos(todos);
+      input.value = "";
+      render();
+    }
+
+    function toggleDone(index) {
+      const todos = loadTodos();
+      todos[index].done = !todos[index].done;
+      saveTodos(todos);
+      render();
+    }
+
+    function removeTodo(index) {
+      const todos = loadTodos();
+      todos.splice(index, 1);
+      saveTodos(todos);
+      render();
+    }
+
+    addBtn.addEventListener("click", addTodo);
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") addTodo();
+    });
+
+    render();
+  </script>
+</body>
+</html>
