@@ -1,0 +1,12 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Status
+
+This repository is currently empty (no commits, no source files). There is no
+build system, test suite, or code architecture to document yet.
+
+When code is added to this repository, update this file with:
+- Commands for building, linting, and running tests (including how to run a single test)
+- An overview of the high-level architecture and code structure
