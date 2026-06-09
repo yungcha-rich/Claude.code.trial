@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korea ESS Key Summary</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #1a1a2e;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100vh;
+    padding: 20px;
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .toolbar button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all .2s;
+  }
+  #editBtn  { background: #e94560; color: #fff; }
+  #editBtn:hover  { background: #c73652; }
+  #saveBtn  { background: #0f9b58; color: #fff; display: none; }
+  #saveBtn:hover  { background: #0b7d47; }
+  #printBtn { background: #4a90d9; color: #fff; }
+  #printBtn:hover { background: #357abd; }
+
+  /* ── Slide container (16:9 ≈ 1280×720) ── */
+  .slide {
+    width: 1280px;
+    min-height: 720px;
+    background: linear-gradient(135deg, #0d1b2a 0%, #1b2a3b 100%);
+    border: 1px solid #2a3f55;
+    border-radius: 12px;
+    padding: 36px 44px 32px;
+    color: #e8edf2;
+    position: relative;
+    box-shadow: 0 24px 60px rgba(0,0,0,.6);
+  }
+
+  /* ── Header ── */
+  .slide-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    border-bottom: 2px solid #e94560;
+    padding-bottom: 12px;
+    margin-bottom: 22px;
+  }
+  .slide-title { font-size: 22px; font-weight: 700; color: #fff; letter-spacing: .5px; }
+  .slide-subtitle { font-size: 12px; color: #8fa8bf; margin-top: 4px; }
+  .badge {
+    background: #e94560;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 4px 12px;
+    border-radius: 12px;
+    letter-spacing: .5px;
+  }
+
+  /* ── 4-column grid ── */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .card {
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.08);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .card-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #e94560;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid rgba(233,69,96,.3);
+  }
+
+  /* ── Root Cause (card 1) ── */
+  .bullet { font-size: 12px; color: #c5d5e5; line-height: 1.7; }
+  .bullet li { margin-bottom: 4px; padding-left: 4px; }
+
+  /* ── Booking table (card 2) ── */
+  .booking-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+  .booking-table th {
+    background: rgba(233,69,96,.2);
+    color: #e94560;
+    padding: 5px 6px;
+    text-align: center;
+    font-weight: 700;
+  }
+  .booking-table td {
+    padding: 5px 6px;
+    text-align: center;
+    color: #c5d5e5;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+  }
+  .booking-table tr:last-child td { border-bottom: none; }
+  .note { font-size: 10px; color: #7a9ab5; margin-top: 8px; }
+  .highlight { color: #4dd9ac; font-weight: 600; }
+
+  /* ── Recovery Plan (card 3) ── */
+  .tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+  .tag-short { background: rgba(233,69,96,.25); color: #e94560; }
+  .tag-mid   { background: rgba(77,217,172,.2);  color: #4dd9ac; }
+
+  /* ── Risk & Support (card 4) ── */
+  .risk-label {
+    font-size: 10px;
+    font-weight: 700;
+    color: #f0c040;
+    margin-bottom: 4px;
+    margin-top: 8px;
+  }
+  .risk-label:first-child { margin-top: 0; }
+
+  /* ── Footer ── */
+  .slide-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top: 10px;
+    font-size: 10px;
+    color: #5a7a95;
+  }
+
+  /* ── Edit mode ── */
+  [contenteditable="true"] {
+    outline: 1px dashed #e94560;
+    border-radius: 4px;
+    background: rgba(233,69,96,.05);
+    cursor: text;
+    min-height: 1em;
+  }
+  [contenteditable="true"]:focus { outline: 1.5px solid #e94560; background: rgba(233,69,96,.1); }
+
+  /* ── Print ── */
+  @media print {
+    body { background: #fff; padding: 0; }
+    .toolbar { display: none; }
+    .slide {
+      width: 100%; min-height: unset;
+      border: none; border-radius: 0;
+      box-shadow: none;
+    }
+  }
+
+  @media (max-width: 1320px) {
+    .slide { width: 100%; min-height: unset; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── Toolbar ── -->
+<div class="toolbar">
+  <button id="editBtn"  onclick="toggleEdit()">✏️ Edit</button>
+  <button id="saveBtn"  onclick="saveEdit()">💾 Save</button>
+  <button id="printBtn" onclick="window.print()">🖨️ Print / Export PDF</button>
+</div>
+
+<!-- ══════════════════════════════════════════
+     SLIDE  (edit text directly in Edit mode)
+═══════════════════════════════════════════ -->
+<div class="slide" id="slide">
+
+  <!-- Header -->
+  <div class="slide-header">
+    <div>
+      <div class="slide-title" data-key="title">Korea ESS Key Summary</div>
+      <div class="slide-subtitle" data-key="subtitle">Performance Update &amp; Recovery Plan</div>
+    </div>
+    <div class="badge" data-key="badge">CONFIDENTIAL</div>
+  </div>
+
+  <!-- 4-column grid -->
+  <div class="grid">
+
+    <!-- Card 1 · Root Cause -->
+    <div class="card">
+      <div class="card-title">1. Root Cause Analysis</div>
+      <ul class="bullet" data-key="rootcause" style="padding-left:14px">
+        <li>Partial SK On cancellations: Pre-test (CAD 217K), Indoor LSFT (CAD 434K) — cost optimization &amp; non-mandatory scope removal</li>
+        <li>SK's technical / readiness gaps</li>
+        <li>Compressed timelines → increased execution risk</li>
+        <li>Limited LSFT manpower &amp; experience on SK side</li>
+      </ul>
+    </div>
+
+    <!-- Card 2 · Booking -->
+    <div class="card">
+      <div class="card-title">2. Current ESS Booking</div>
+      <table class="booking-table">
+        <thead>
+          <tr><th colspan="2">ESS Booking Goal</th><th colspan="2">SK On</th></tr>
+          <tr><th>Period</th><th>CAD M$</th><th>FY26/27</th><th>CAD M$</th></tr>
+        </thead>
+        <tbody data-key="bookingtable">
+          <tr><td>H1 (Booked)</td><td>1.7</td><td>Completed</td><td>0.11</td></tr>
+          <tr><td>H2</td><td>1.0</td><td>Booked</td><td>0.86</td></tr>
+          <tr><td><b>Total</b></td><td><b>2.7</b></td><td><b>Total</b></td><td class="highlight"><b>0.97</b></td></tr>
+        </tbody>
+      </table>
+      <div class="note" data-key="bookingnote">* CAD 0.65M canceled · On track vs. ~3.5× YoY growth target</div>
+    </div>
+
+    <!-- Card 3 · Recovery Plan -->
+    <div class="card">
+      <div class="card-title">3. Recovery Plan</div>
+      <div class="tag tag-short">Short-term</div>
+      <ul class="bullet" data-key="recovery-short" style="padding-left:14px">
+        <li>LGES LSFT @ Safe Labs <b>(June, CAD 708K)</b>: critical reference for future collab.</li>
+        <li>SK LSFT <b>(July, CAD 666K)</b>: key project for revenue &amp; future pipeline</li>
+      </ul>
+      <br>
+      <div class="tag tag-mid">Mid-term</div>
+      <ul class="bullet" data-key="recovery-mid" style="padding-left:14px">
+        <li>LG: expand LSFT → NFPA 68/69</li>
+        <li>Samsung SDI: entry via reference-based engagements</li>
+      </ul>
+    </div>
+
+    <!-- Card 4 · Risk & Support -->
+    <div class="card">
+      <div class="card-title">4. Risk &amp; Support Required</div>
+      <div class="risk-label">⚠ Key Risks</div>
+      <ul class="bullet" data-key="risks" style="padding-left:14px">
+        <li>SK delivery issues (schedule pressure) → future awards &amp; CSA pipeline at risk</li>
+        <li>LG AHJ challenges in North America → market perception &amp; follow-on projects</li>
+      </ul>
+      <div class="risk-label" style="margin-top:10px">🛠 Support Needed</div>
+      <ul class="bullet" data-key="support" style="padding-left:14px">
+        <li>LG AHJ interface (SI/FE collab. + local network)</li>
+        <li>CSA capability clarification for NEC (NFPA 70/70E)</li>
+      </ul>
+    </div>
+
+  </div><!-- /grid -->
+
+  <!-- Footer -->
+  <div class="slide-footer">
+    <span data-key="footer-left">Korea ESS Business Update — FY2026</span>
+    <span data-key="footer-right">Internal Use Only</span>
+  </div>
+
+</div><!-- /slide -->
+
+<script>
+  let editing = false;
+  const EDITABLE_KEYS = [
+    'title','subtitle','badge',
+    'rootcause',
+    'bookingtable','bookingnote',
+    'recovery-short','recovery-mid',
+    'risks','support',
+    'footer-left','footer-right'
+  ];
+
+  function toggleEdit() {
+    editing = true;
+    document.getElementById('editBtn').style.display = 'none';
+    document.getElementById('saveBtn').style.display = 'inline-block';
+    EDITABLE_KEYS.forEach(key => {
+      const el = document.querySelector(`[data-key="${key}"]`);
+      if (el) el.contentEditable = 'true';
+    });
+  }
+
+  function saveEdit() {
+    editing = false;
+    document.getElementById('editBtn').style.display = 'inline-block';
+    document.getElementById('saveBtn').style.display = 'none';
+    EDITABLE_KEYS.forEach(key => {
+      const el = document.querySelector(`[data-key="${key}"]`);
+      if (el) el.contentEditable = 'false';
+    });
+    // persist to localStorage
+    const data = {};
+    EDITABLE_KEYS.forEach(key => {
+      const el = document.querySelector(`[data-key="${key}"]`);
+      if (el) data[key] = el.innerHTML;
+    });
+    localStorage.setItem('korea_ess_slide', JSON.stringify(data));
+    alert('저장되었습니다. 다음에 이 파일을 열면 내용이 유지됩니다.');
+  }
+
+  // restore saved content on load
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('korea_ess_slide');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        EDITABLE_KEYS.forEach(key => {
+          const el = document.querySelector(`[data-key="${key}"]`);
+          if (el && data[key] !== undefined) el.innerHTML = data[key];
+        });
+      } catch(e) {}
+    }
+  });
+</script>
+</body>
+</html>
