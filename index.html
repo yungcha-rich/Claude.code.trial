@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AH의 성장일지 🌸</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: linear-gradient(135deg, #FFF0F5 0%, #F0FFF8 100%);
+    min-height: 100vh;
+    color: #444;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  header {
+    text-align: center;
+    padding: 28px 16px 20px;
+    background: linear-gradient(135deg, #FFB7C5 0%, #B2EBD8 100%);
+    border-radius: 0 0 32px 32px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(255, 143, 171, 0.25);
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(255,100,130,0.3);
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    color: rgba(255,255,255,0.85);
+    font-size: 0.9rem;
+    margin-top: 4px;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: rgba(255,255,255,0.7);
+    padding: 6px;
+    border-radius: 20px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 10px 8px;
+    border: none;
+    border-radius: 14px;
+    background: transparent;
+    color: #888;
+    font-size: 0.82rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    white-space: nowrap;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, #FF8FAB, #FFB7C5);
+    color: #fff;
+    box-shadow: 0 3px 12px rgba(255, 143, 171, 0.4);
+  }
+
+  .tab-btn:not(.active):hover {
+    background: rgba(255,183,197,0.2);
+    color: #FF8FAB;
+  }
+
+  /* Views */
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Card */
+  .card {
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    padding: 22px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    border: 1px solid rgba(255,183,197,0.2);
+  }
+
+  .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #FF8FAB;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Form */
+  .form-group {
+    margin-bottom: 16px;
+  }
+
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #666;
+    margin-bottom: 6px;
+  }
+
+  input[type="date"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    padding: 10px 14px;
+    border: 2px solid #FFE0EA;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-family: inherit;
+    background: #FFFAFA;
+    color: #444;
+    transition: border-color 0.2s;
+    outline: none;
+    resize: vertical;
+  }
+
+  input[type="date"]:focus,
+  input[type="number"]:focus,
+  textarea:focus {
+    border-color: #FF8FAB;
+    background: #fff;
+  }
+
+  textarea { min-height: 80px; }
+
+  /* Star rating */
+  .star-rating {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .star {
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #ddd;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+
+  .star.active { color: #FFD700; }
+  .star:hover { transform: scale(1.15); }
+
+  /* Buttons */
+  .btn {
+    display: inline-block;
+    padding: 12px 28px;
+    border: none;
+    border-radius: 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #FF8FAB, #FFB7C5);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(255,143,171,0.4);
+    width: 100%;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(255,143,171,0.5);
+  }
+
+  .btn-primary:active { transform: translateY(0); }
+
+  .btn-mint {
+    background: linear-gradient(135deg, #7DCFB6, #B2EBD8);
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(125,207,182,0.4);
+    width: 100%;
+  }
+
+  .btn-mint:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(125,207,182,0.5);
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: #444;
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    white-space: nowrap;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* Timeline */
+  .timeline-card {
+    background: rgba(255,255,255,0.85);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    border-left: 5px solid #FFB7C5;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .timeline-card::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 80px; height: 80px;
+    background: linear-gradient(135deg, transparent 50%, rgba(178,235,216,0.15) 50%);
+  }
+
+  .timeline-date {
+    font-size: 0.82rem;
+    color: #7DCFB6;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .timeline-stars {
+    font-size: 0.95rem;
+    margin-bottom: 10px;
+  }
+
+  .timeline-section {
+    margin-bottom: 10px;
+  }
+
+  .timeline-section-label {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #FF8FAB;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .timeline-section-text {
+    font-size: 0.88rem;
+    color: #555;
+    line-height: 1.55;
+    background: rgba(255,183,197,0.08);
+    padding: 8px 12px;
+    border-radius: 10px;
+  }
+
+  .badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #B2EBD8, #7DCFB6);
+    color: #fff;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 700;
+  }
+
+  /* Charts */
+  .chart-wrapper {
+    position: relative;
+    height: 220px;
+    margin-bottom: 8px;
+  }
+
+  /* Data table */
+  .data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    margin-top: 12px;
+  }
+
+  .data-table th {
+    background: linear-gradient(135deg, #FFB7C5, #FF8FAB);
+    color: #fff;
+    padding: 9px 12px;
+    text-align: center;
+    font-weight: 700;
+  }
+
+  .data-table th:first-child { border-radius: 10px 0 0 0; }
+  .data-table th:last-child { border-radius: 0 10px 0 0; }
+
+  .data-table td {
+    padding: 8px 12px;
+    text-align: center;
+    border-bottom: 1px solid #FFE0EA;
+    color: #555;
+  }
+
+  .data-table tr:nth-child(even) td { background: rgba(255,183,197,0.06); }
+  .data-table tr:last-child td:first-child { border-radius: 0 0 0 10px; }
+  .data-table tr:last-child td:last-child { border-radius: 0 0 10px 0; }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: #aaa;
+    font-size: 0.9rem;
+  }
+
+  .empty-state .emoji { font-size: 2.5rem; display: block; margin-bottom: 10px; }
+
+  .inline-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  @media (max-width: 400px) {
+    header h1 { font-size: 1.4rem; }
+    .tab-btn { font-size: 0.75rem; padding: 9px 4px; }
+    .inline-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌸 AH의 성장일지</h1>
+  <p>소중한 AH의 모든 순간을 기록해요 💕</p>
+</header>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('journal')">✏️ 일지 작성</button>
+    <button class="tab-btn" onclick="showTab('growth')">📈 키/몸무게</button>
+    <button class="tab-btn" onclick="showTab('timeline')">🗂️ 타임라인</button>
+  </div>
+
+  <!-- JOURNAL VIEW -->
+  <div id="view-journal" class="view active">
+    <div class="card">
+      <div class="card-title">✏️ 오늘의 일지</div>
+
+      <div class="form-group">
+        <label>📅 날짜</label>
+        <input type="date" id="j-date" onchange="loadJournalForDate(this.value)">
+      </div>
+
+      <div class="form-group">
+        <label>📝 오늘의 기록</label>
+        <textarea id="j-record" placeholder="오늘 AH는 어떤 하루를 보냈나요? 🌟"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>🌈 처음 한 것들</label>
+        <textarea id="j-firsts" placeholder="오늘 처음으로 해본 것들을 적어주세요 ✨" style="min-height:60px;"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>💫 컨디션</label>
+        <div class="star-rating" id="star-rating">
+          <span class="star" data-val="1" onclick="setRating(1)">★</span>
+          <span class="star" data-val="2" onclick="setRating(2)">★</span>
+          <span class="star" data-val="3" onclick="setRating(3)">★</span>
+          <span class="star" data-val="4" onclick="setRating(4)">★</span>
+          <span class="star" data-val="5" onclick="setRating(5)">★</span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>💌 엄마/아빠의 한마디</label>
+        <textarea id="j-parent" placeholder="AH에게 전하고 싶은 말을 남겨주세요 💝" style="min-height:60px;"></textarea>
+      </div>
+
+      <button class="btn btn-primary" onclick="saveJournal()">💾 저장하기</button>
+    </div>
+  </div>
+
+  <!-- GROWTH VIEW -->
+  <div id="view-growth" class="view">
+    <div class="card">
+      <div class="card-title">📏 키/몸무게 기록</div>
+      <div class="form-group">
+        <label>📅 날짜</label>
+        <input type="date" id="g-date">
+      </div>
+      <div class="inline-grid">
+        <div class="form-group">
+          <label>📏 키 (cm)</label>
+          <input type="number" id="g-height" placeholder="예: 75" step="0.1" min="0" max="250">
+        </div>
+        <div class="form-group">
+          <label>⚖️ 몸무게 (kg)</label>
+          <input type="number" id="g-weight" placeholder="예: 9.5" step="0.1" min="0" max="200">
+        </div>
+      </div>
+      <button class="btn btn-mint" onclick="saveGrowth()">💾 저장하기</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📈 키 변화</div>
+      <div class="chart-wrapper">
+        <canvas id="heightChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⚖️ 몸무게 변화</div>
+      <div class="chart-wrapper">
+        <canvas id="weightChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 기록 목록</div>
+      <div id="growth-table-wrapper"></div>
+    </div>
+  </div>
+
+  <!-- TIMELINE VIEW -->
+  <div id="view-timeline" class="view">
+    <div id="timeline-list"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─────────────────────────────────────────
+// Storage helpers
+// ─────────────────────────────────────────
+const JOURNAL_KEY = 'ah_journal';
+const GROWTH_KEY  = 'ah_growth';
+const INIT_KEY    = 'ah_journal_initialized';
+
+function getJournals() {
+  try { return JSON.parse(localStorage.getItem(JOURNAL_KEY)) || {}; }
+  catch(e) { return {}; }
+}
+function saveJournals(data) { localStorage.setItem(JOURNAL_KEY, JSON.stringify(data)); }
+
+function getGrowthData() {
+  try { return JSON.parse(localStorage.getItem(GROWTH_KEY)) || []; }
+  catch(e) { return []; }
+}
+function saveGrowthData(data) { localStorage.setItem(GROWTH_KEY, JSON.stringify(data)); }
+
+// ─────────────────────────────────────────
+// Initialize sample data
+// ─────────────────────────────────────────
+function initSampleData() {
+  if (localStorage.getItem(INIT_KEY)) return;
+
+  const journals = {};
+  journals['2020-04-24'] = {
+    date: '2020-04-24',
+    record: '오늘 처음으로 혼자 걸었어요! 아장아장 걸음마를 했답니다.',
+    firsts: '혼자 걷기',
+    condition: 5,
+    parent: '우리 AH 너무 기특해요! 첫 걸음마 축하해 🎉'
+  };
+  saveJournals(journals);
+
+  const growth = [{ date: '2020-04-24', height: 75, weight: 9.5 }];
+  saveGrowthData(growth);
+
+  localStorage.setItem(INIT_KEY, '1');
+}
+
+// ─────────────────────────────────────────
+// Tab navigation
+// ─────────────────────────────────────────
+function showTab(name) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+
+  if (name === 'growth') renderGrowth();
+  if (name === 'timeline') renderTimeline();
+}
+
+// ─────────────────────────────────────────
+// Toast
+// ─────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ─────────────────────────────────────────
+// Star rating
+// ─────────────────────────────────────────
+let currentRating = 0;
+
+function setRating(val) {
+  currentRating = val;
+  document.querySelectorAll('#star-rating .star').forEach(s => {
+    s.classList.toggle('active', parseInt(s.dataset.val) <= val);
+  });
+}
+
+function renderStars(val) {
+  return '★'.repeat(val) + '☆'.repeat(5 - val);
+}
+
+// ─────────────────────────────────────────
+// Journal
+// ─────────────────────────────────────────
+function todayStr() {
+  const d = new Date();
+  return d.toISOString().slice(0, 10);
+}
+
+function loadJournalForDate(dateStr) {
+  if (!dateStr) return;
+  const journals = getJournals();
+  const entry = journals[dateStr];
+  if (entry) {
+    document.getElementById('j-record').value = entry.record || '';
+    document.getElementById('j-firsts').value = entry.firsts || '';
+    document.getElementById('j-parent').value = entry.parent || '';
+    setRating(entry.condition || 0);
+  } else {
+    document.getElementById('j-record').value = '';
+    document.getElementById('j-firsts').value = '';
+    document.getElementById('j-parent').value = '';
+    setRating(0);
+  }
+}
+
+function saveJournal() {
+  const date = document.getElementById('j-date').value;
+  if (!date) { showToast('⚠️ 날짜를 선택해주세요!'); return; }
+  const record = document.getElementById('j-record').value.trim();
+  const firsts = document.getElementById('j-firsts').value.trim();
+  const parent = document.getElementById('j-parent').value.trim();
+
+  if (!record && !firsts && !parent && currentRating === 0) {
+    showToast('⚠️ 내용을 입력해주세요!');
+    return;
+  }
+
+  const journals = getJournals();
+  journals[date] = { date, record, firsts, condition: currentRating, parent };
+  saveJournals(journals);
+  showToast('✅ 일지가 저장되었어요 🌸');
+}
+
+// ─────────────────────────────────────────
+// Timeline
+// ─────────────────────────────────────────
+function renderTimeline() {
+  const journals = getJournals();
+  const list = document.getElementById('timeline-list');
+  const entries = Object.values(journals).sort((a, b) => b.date.localeCompare(a.date));
+
+  if (entries.length === 0) {
+    list.innerHTML = `<div class="empty-state"><span class="emoji">🌱</span>아직 일지가 없어요.<br>첫 번째 일지를 작성해봐요!</div>`;
+    return;
+  }
+
+  list.innerHTML = entries.map(e => {
+    const stars = e.condition ? `<div class="timeline-stars" title="컨디션">${renderStars(e.condition)}</div>` : '';
+    const record = e.record ? `<div class="timeline-section"><div class="timeline-section-label">📝 오늘의 기록</div><div class="timeline-section-text">${escHtml(e.record)}</div></div>` : '';
+    const firsts = e.firsts ? `<div class="timeline-section"><div class="timeline-section-label">🌈 처음 한 것들</div><div class="timeline-section-text">${escHtml(e.firsts)}</div></div>` : '';
+    const parent = e.parent ? `<div class="timeline-section"><div class="timeline-section-label">💌 엄마/아빠의 한마디</div><div class="timeline-section-text">${escHtml(e.parent)}</div></div>` : '';
+    return `
+      <div class="timeline-card">
+        <div class="timeline-date">📅 ${formatDate(e.date)}</div>
+        ${stars}
+        ${record}${firsts}${parent}
+      </div>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');
+}
+
+function formatDate(dateStr) {
+  const d = new Date(dateStr + 'T00:00:00');
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`;
+}
+
+// ─────────────────────────────────────────
+// Growth charts
+// ─────────────────────────────────────────
+let heightChart = null;
+let weightChart = null;
+
+function saveGrowth() {
+  const date   = document.getElementById('g-date').value;
+  const height = parseFloat(document.getElementById('g-height').value);
+  const weight = parseFloat(document.getElementById('g-weight').value);
+
+  if (!date) { showToast('⚠️ 날짜를 선택해주세요!'); return; }
+  if (isNaN(height) && isNaN(weight)) { showToast('⚠️ 키 또는 몸무게를 입력해주세요!'); return; }
+
+  const data = getGrowthData();
+  const idx = data.findIndex(d => d.date === date);
+  const entry = { date, height: isNaN(height) ? null : height, weight: isNaN(weight) ? null : weight };
+
+  if (idx >= 0) data[idx] = entry;
+  else data.push(entry);
+
+  data.sort((a, b) => a.date.localeCompare(b.date));
+  saveGrowthData(data);
+
+  document.getElementById('g-height').value = '';
+  document.getElementById('g-weight').value = '';
+
+  showToast('✅ 성장 기록이 저장되었어요 📏');
+  renderGrowth();
+}
+
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: { display: false },
+    tooltip: {
+      backgroundColor: 'rgba(255,255,255,0.95)',
+      titleColor: '#FF8FAB',
+      bodyColor: '#555',
+      borderColor: '#FFB7C5',
+      borderWidth: 1,
+      padding: 10,
+      cornerRadius: 10,
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: 'rgba(0,0,0,0.04)' },
+      ticks: { color: '#aaa', font: { size: 11 } }
+    },
+    y: {
+      grid: { color: 'rgba(0,0,0,0.04)' },
+      ticks: { color: '#aaa', font: { size: 11 } }
+    }
+  },
+  elements: {
+    point: { radius: 5, hoverRadius: 7 },
+    line: { tension: 0.4 }
+  }
+};
+
+function renderGrowth() {
+  const data = getGrowthData();
+  const labels = data.map(d => formatDate(d.date));
+  const heights = data.map(d => d.height);
+  const weights = data.map(d => d.weight);
+
+  // Height chart
+  if (heightChart) heightChart.destroy();
+  const hCtx = document.getElementById('heightChart').getContext('2d');
+  heightChart = new Chart(hCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: '키 (cm)',
+        data: heights,
+        borderColor: '#FF8FAB',
+        backgroundColor: 'rgba(255,143,171,0.12)',
+        fill: true,
+        pointBackgroundColor: '#FF8FAB',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+      }]
+    },
+    options: JSON.parse(JSON.stringify(CHART_DEFAULTS))
+  });
+
+  // Weight chart
+  if (weightChart) weightChart.destroy();
+  const wCtx = document.getElementById('weightChart').getContext('2d');
+  weightChart = new Chart(wCtx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: '몸무게 (kg)',
+        data: weights,
+        borderColor: '#7DCFB6',
+        backgroundColor: 'rgba(125,207,182,0.12)',
+        fill: true,
+        pointBackgroundColor: '#7DCFB6',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+      }]
+    },
+    options: JSON.parse(JSON.stringify(CHART_DEFAULTS))
+  });
+
+  // Table
+  const wrapper = document.getElementById('growth-table-wrapper');
+  if (data.length === 0) {
+    wrapper.innerHTML = `<div class="empty-state"><span class="emoji">📏</span>아직 기록이 없어요!</div>`;
+    return;
+  }
+
+  const rows = [...data].reverse().map(d => `
+    <tr>
+      <td>${formatDate(d.date)}</td>
+      <td>${d.height != null ? d.height + ' cm' : '-'}</td>
+      <td>${d.weight != null ? d.weight + ' kg' : '-'}</td>
+    </tr>`).join('');
+
+  wrapper.innerHTML = `
+    <table class="data-table">
+      <thead><tr><th>날짜</th><th>키</th><th>몸무게</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+}
+
+// ─────────────────────────────────────────
+// Init
+// ─────────────────────────────────────────
+initSampleData();
+document.getElementById('j-date').value = todayStr();
+loadJournalForDate(todayStr());
+document.getElementById('g-date').value = todayStr();
+</script>
+</body>
+</html>
